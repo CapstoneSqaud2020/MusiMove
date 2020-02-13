@@ -28,5 +28,7 @@ def addNewUser(username, password):
     insert = acc.insert_one({"usrnm":username, "pw":password})
     #returns the account id of the user(which is generated client side when added to the collection)
     return insert.inserted_id
+def deleteUser():
+    return 0
 
 
