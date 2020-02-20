@@ -2,6 +2,11 @@ import numpy as np
 import os
 import cv2
 
+import threading
+from PIL import ImageTk, Image
+import tkinter as tk
+#import BinarySilhouette 
+
 
 filename = 'video.avi'
 frames_per_second = 24.0
@@ -48,17 +53,57 @@ def get_video_type(filename):
 
 
 
-cap = cv2.VideoCapture(1)
-out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(cap, res))
+#out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(cap, res))
 
-while True:
-   ret, frame = cap.read()
-   out.write(frame)
-   cv2.imshow('frame',frame)
-   if cv2.waitKey(1) & 0xFF == ord('q'):
-       break
+def startVideoProc(self):
+    self.stopEvent = threading.Event()
+    self.cap = cv2.VideoCapture(0)
+    self.out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(self.cap, res))
+    startVideo(self)
 
 
-cap.release()
-out.release()
-cv2.destroyAllWindows()
+def startVideo(self):
+    #out.write(frame)
+    try:
+        if not self.stopEvent.is_set():
+        
+            _, self.frame = self.cap.read()
+            frame1 = cv2.flip(self.frame, 1)
+            cv2image = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGBA)
+            img = Image.fromarray(cv2image)
+            imgtk = ImageTk.PhotoImage(image=img)
+        
+            if self.panel is None:
+                self.panel = tk.Label(self.root, bg="#80c1ff")
+                self.panel.place(relwidth = .6, relheight = .6,relx = .2, rely = .2)
+                self.panel.image = imgtk
+            else:
+                self.panel.configure(image=imgtk)
+                self.panel.image = imgtk
+            
+            self.panel.after(10, lambda : startVideo(self))
+
+    except RuntimeError:
+        print("[INFO] caught a RuntimeError")
+  
+def saveVideoProc(self):
+    if (self.rec['text'] == "Record"):
+        self.rec.configure(text= "Continue ->")
+        saveVideo(self)
+        self.rec.config(command = lambda: self.)
+    else:
+        self.stopEvent.set()
+        self.cap.release()
+        self.out.release()
+        cv2.destroyAllWindows()
+
+
+def saveVideo(self):
+    if not self.stopEvent.is_set():
+         self.out.write(self.frame)
+         self.panel.after(10, lambda : saveVideo(self))
+
+
+#cap.release()
+#out.release()
+#cv2.destroyAllWindows()
