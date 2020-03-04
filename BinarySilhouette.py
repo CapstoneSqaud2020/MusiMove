@@ -2,9 +2,10 @@ import os
 import sklearn.preprocessing
 import numpy as np 
 import cv2 
+import GaitDetection
 
 
-def preprocess():
+def preprocess(user_id):
     #gets video
     cap = cv2.VideoCapture('video.avi') 
     width  = cap.get(3)
@@ -68,3 +69,5 @@ def preprocess():
 
     cap.release() 
     cv2.destroyAllWindows() 
+    os.remove('video.avi')
+

@@ -92,7 +92,7 @@ def stopVideoProc(self):
         self.cap.release()
         self.out.release()
         cv2.destroyAllWindows()
-        BinarySilhouette.preprocess()
+        return BinarySilhouette.preprocess(self.user_id)
 
 
 def saveVideo(self):

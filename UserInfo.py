@@ -27,7 +27,6 @@ def addNewUser(username, password):
     acc = db.account
     insert = acc.insert_one({"usrnm":username.lower(), "pw":password, "timeout": "Never Stop PLAYING"})
     #returns the account id of the user(which is generated client side when added to the collection)
-    print(insert.inserted_id)
     return insert.inserted_id
 
 def deleteUser(user_id):

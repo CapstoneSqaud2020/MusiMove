@@ -191,7 +191,7 @@ class Applcation:
         self.root.minsize(height = self.HEIGHT, width = self.WIDTH)
         self.root.title("MusiMove - The music that moves you")
         self.welcome()
-        #self.recordVideo()   
+        #self.musicManager()   
         self.root.mainloop()
 
 
