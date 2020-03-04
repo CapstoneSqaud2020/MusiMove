@@ -25,8 +25,20 @@ def login(username, password):
 #adds username&pw to db
 def addNewUser(username, password):
     acc = db.account
-    insert = acc.insert_one({"usrnm":username.lower(), "pw":password})
+    insert = acc.insert_one({"usrnm":username.lower(), "pw":password, "timeout": "Never Stop PLAYING"})
     #returns the account id of the user(which is generated client side when added to the collection)
+    print(insert.inserted_id)
     return insert.inserted_id
 
+def deleteUser(user_id):
+    acc = db.account
+    acc.delete_one({"_id":user_id})
 
+def updateStopTime(user_id, value):
+    acc = db.account
+    acc.update_one({"_id":user_id}, {"$set": {"timeout": value}})
+
+def getStopTime(user_id):
+    acc = db.account
+    user = acc.find({"_id":user_id})
+    return user[0].get("timeout")

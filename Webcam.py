@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import cv2
+import BinarySilhouette
 
 import threading
 from PIL import ImageTk, Image
@@ -86,16 +87,12 @@ def startVideo(self):
     except RuntimeError:
         print("[INFO] caught a RuntimeError")
   
-def saveVideoProc(self):
-    if (self.rec['text'] == "Record"):
-        self.rec.configure(text= "Continue ->")
-        saveVideo(self)
-        self.rec.config(command = lambda: self.)
-    else:
+def stopVideoProc(self):
         self.stopEvent.set()
         self.cap.release()
         self.out.release()
         cv2.destroyAllWindows()
+        BinarySilhouette.preprocess()
 
 
 def saveVideo(self):
