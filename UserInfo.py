@@ -25,9 +25,18 @@ def login(username, password):
 #adds username&pw to db
 def addNewUser(username, password):
     acc = db.account
-    insert = acc.insert_one({"usrnm":username.lower(), "pw":password, "timeout": "Never Stop PLAYING"})
+    id = 100000004 + inc()
+    print(id)
+    insert = acc.insert_one({"_id":id, "usrnm":username.lower(), "pw":password, "timeout": "Never Stop PLAYING"})
     #returns the account id of the user(which is generated client side when added to the collection)
-    return insert.inserted_id
+    return id
+
+def inc():
+    c = db.count
+    num = c.find({"_id":'5e60a40c1c9d4400002379d4'})
+    c.update_one({"_id":'5e60a40c1c9d4400002379d4'}, {"$inc": {"count": 1}})
+    return num[0].get("count")
+
 
 def deleteUser(user_id):
     acc = db.account

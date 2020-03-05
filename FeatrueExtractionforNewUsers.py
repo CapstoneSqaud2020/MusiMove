@@ -19,7 +19,7 @@ def findGEI(preProcessedData):
         tempArr = np.asarray(d.get("cycleImgs"))
         GEIs.append(np.mean(tempArr, axis = 0))
         
-    subIds = pd.DataFrame.to_numpy(testDf['usr_id'], dtype = 'int32')
+    subIds = testDf['usr_id'].to_numpy(dtype = 'int32')
     
     return GEIs, subIds
 
@@ -44,9 +44,9 @@ def getFeatures(preProcessedData):
 def callModel(preProcessedData):
     
     X_train, X_test, y_train, y_test = getFeatures(preProcessedData)
+    return 1
+#    probVectorORClass = CNN(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
     
-    probVectorORClass = CNN(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
-    
-    return probVectorORClass
+#    return probVectorORClass
     
 
