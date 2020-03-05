@@ -8,8 +8,8 @@ import GaitDetection
 
 def preprocess(user_id):
     #gets video
-    #cap = cv2.VideoCapture('video.avi') 
-    cap = cv2.VideoCapture(r'C:\Users\JS-X360\Pictures\Original-20200129T082016Z-001\Original\N2_Trim.avi') 
+    cap = cv2.VideoCapture('video.avi') 
+    #cap = cv2.VideoCapture(r'C:\Users\JS-X360\Pictures\Original-20200129T082016Z-001\Original\N2_Trim.avi') 
     width  = cap.get(3)
     #filter to subtract bg
     fgbg = cv2.createBackgroundSubtractorKNN() 
