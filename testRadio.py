@@ -2,29 +2,34 @@ import vlc
 import time
 
 
-def playRadioFromSite(url):
-    #url = "http://stream.revma.ihrhls.com/zc545"  # ed sheeran iheartradio station
+player = None
+is_paused = True
 
-    #url2 = "https://stream.revma.ihrhls.com/zc2341"  # lumineers iheartradio station
+def setRadio(url):
+    global player 
+    player= vlc.MediaPlayer(url)
 
-    player = vlc.MediaPlayer(url)
-
-    player.play()
-    while True:
-        pass
-
-    return null
+def setPlaylist():
+    global player
 
 
-def playRadioFromFile(fileName):
+def play():
+    global player, is_paused 
+    if not(player is None) and is_paused:
+        player.play()
+        is_paused = False
 
-    fileName = "file_example_MP3_700KB.mp3"
+def pause():
 
-    player = vlc.MediaPlayer(fileName)
+    global player, is_paused 
+    if not (player is None and is_paused):
+        player.pause()
+        is_paused = True
 
-    player.play()
-    while True:
-        pass
+def stop():
+    global player, is_paused
+    if not(player is None):
+        player.stop()
+    is_paused = True
 
-    return null
 

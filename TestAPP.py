@@ -2,6 +2,7 @@
 import tkinter as tk
 import UserInfo 
 import Webcam
+import testRadio
 from tkinter import messagebox
 import os
 
@@ -14,8 +15,63 @@ class Applcation:
         frame = tk.Frame(self.root, bg="#C1DDE7", bd=5)
         frame.place(relwidth = .8, relheight = 1, relx = 0, rely = 0)
         
+        if UserInfo.getMusicOpt(self.user_id) == "Radio":
+            tk.Label(frame, text = "Pick a Radio Station:", bg="#C1DDE7", font=("Helvetica", 12)).place(relwidth = .333, relheight = 0.1, relx = .333, rely = .2)
+            
+            stations = ["ed sheeran iheartradio station","lumineers iheartradio station"]
+            urls = ["http://stream.revma.ihrhls.com/zc545", "https://stream.revma.ihrhls.com/zc2341"]
+
+            index = UserInfo.getRadioStation(self.user_id)
+
+            testRadio.setRadio(urls[index])
+
+            dropVar = tk.StringVar()
+            dropVar.set(stations[index])
+            opts = tk.OptionMenu(frame, dropVar, *stations, command= self.changeRadStation)
+            opts.place(relwidth=.333, relheight = .1, rely = .325, relx = .333)
+            
+        else:
+            tk.Label(frame, text = "Playlist:", bg="#C1DDE7", font=("Helvetica", 12)).place(relwidth = .333, relheight = 0.1, relx = .333, rely = .2)            
+            self.musicFiles = []
+            self.musicList = tk.Listbox(frame)
+            self.musicList.place(relwidth=.333, relheight = .1, rely = .325, relx = .333)
+            
+            for f in os.path.listdir("Music"):
+                if os.path.isfile(os.path.join("Music", f)):
+                    self.addPlaylist(f)  
+            
+            #testRadio.setRadio("http://stream.revma.ihrhls.com/zc545")
+
         tk.Label(frame, text = "music", bg = "#E7CBC1", fg = "#FFFFFF", font=("Helvetica", 20)).place(relwidth = .333, relheight = 0.1)
+        play = tk.Button(frame, text = "play", command = testRadio.play).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .1665)
+        pause =  tk.Button(frame, text = "pause", command = testRadio.pause ).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .5)
+        #musicMenu = tk.Menu()
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def changeRadStation(self, value):
+        station = {"ed sheeran iheartradio station": {0:0, 1:"http://stream.revma.ihrhls.com/zc545"},"lumineers iheartradio station":{0:1, 1:"https://stream.revma.ihrhls.com/zc2341"}}
+        index = station.get(value)[0]
+        UserInfo.updateRadioStation(self.user_id, index)
+        
+        was_paused = testRadio.is_paused
+        if not testRadio.is_paused:
+            testRadio.stop()
+        testRadio.setRadio(station.get(value)[1])
+        if not was_paused:
+            testRadio.play()
     
+    def browsefile(self):
+
+
+    def addPlaylist(self, file):
+        self.musicList.insert(0,os.path.basename(file))
+        self.musicFiles.insert(0,file)
+    
+    def removeFile(self):
+        okay
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     def settings(self):
         frame = tk.Frame(self.root, bg="#C1DDE7", bd=5)
         frame.place(relwidth = .8, relheight = 1, relx = 0, rely = 0)
@@ -23,20 +79,27 @@ class Applcation:
 
         tk.Label(frame, text = "Stop playing music after:", bg="#C1DDE7", font=("Helvetica", 12)).place(relwidth = .333, relheight = 0.1, rely = .2, relx = .333)
         
-        Times = [" 5 mins","10 mins","30 mins","1 hr", "2 hrs", "5 hrs", "10 hrs", "Never Stop PLAYING"]
-        dropVar = tk.StringVar()
-        UserInfo.getStopTime
-        dropVar.set(UserInfo.getStopTime(self.user_id))
-
-        opts = tk.OptionMenu(frame, dropVar, *Times, command=self.changeStopTime)
-        opts.place(relwidth=.333, relheight = .1, rely = .35, relx = .333)
-
-        #update = tk.Button(frame, text="Update settings", font=("Helvetica", 12), command=lambda: print(opts.value))
-        #update.place(relwidth=.333, relheight = .1, rely = .6, relx = .333)
+        Times = [" 5 mins","10 mins","30 mins","1 hr", "2 hrs", "5 hrs", "10 hrs", "Stay On"]
+        dropVar1 = tk.StringVar()
+        dropVar1.set(UserInfo.getStopTime(self.user_id))
+        opts1 = tk.OptionMenu(frame, dropVar1, *Times, command= self.changeStopTime)
+        opts1.place(relwidth=.333, relheight = .1, rely = .325, relx = .333)
+        
+        tk.Label(frame, text = "Radio or MP3s:", bg="#C1DDE7", font=("Helvetica", 12)).place(relwidth = .333, relheight = 0.1, rely = .45, relx = .333)
+        
+        musOpts = ["Radio","MP3s"]
+        dropVar2 = tk.StringVar()
+        dropVar2.set(UserInfo.getMusicOpt(self.user_id))
+        opts2 = tk.OptionMenu(frame, dropVar2, *musOpts, command = self.changeMusicOpt)
+        opts2.place(relwidth=.333, relheight = .1, rely = .575, relx = .333)
 
         delete = tk.Button(frame, text="Delete Account", font=("Helvetica", 12), command=self.deleteAccount)
         delete.place(relwidth=.333, relheight = .1, rely = .8, relx = .333)
     
+    def changeMusicOpt(self, value):
+        UserInfo.updateMusicOpt(self.user_id, value)
+        testRadio.pause()
+
     def changeStopTime(self, value):
         UserInfo.updateStopTime(self.user_id, value)
         
@@ -186,12 +249,13 @@ class Applcation:
         self.WIDTH = 1000
 
         #window object w/ window header
-        self.user_id = None
+        #self.user_id = None
+        self.user_id = 10000009
         self.root = tk.Tk()
         self.root.minsize(height = self.HEIGHT, width = self.WIDTH)
         self.root.title("MusiMove - The music that moves you")
-        self.welcome()
-        #self.musicManager()   
+        #self.welcome()
+        self.mainpage()  
         self.root.mainloop()
 
 

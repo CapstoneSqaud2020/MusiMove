@@ -23,7 +23,8 @@
   <ItemGroup>
     <Compile Include="BinarySilhouette.py" />
     <Compile Include="FeatrueExtractionforNewUsers.py" />
-    <Compile Include="GaitDetection.py" />
+    <Compile Include="GaitIsolation.py" />
+    <Compile Include="testRadio.py" />
     <Compile Include="UserInfo.py">
       <SubType>Code</SubType>
     </Compile>

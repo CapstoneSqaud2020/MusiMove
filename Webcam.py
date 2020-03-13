@@ -92,8 +92,8 @@ def stopVideoProc(self):
         self.cap.release()
         self.out.release()
         cv2.destroyAllWindows()
-        return BinarySilhouette.preprocess(self.user_id)
-
+        t = threading.Thread(target = BinarySilhouette.preprocess, args = (self.user_id,))
+        t.start()
 
 def saveVideo(self):
     if not self.stopEvent.is_set():

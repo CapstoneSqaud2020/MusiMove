@@ -12,8 +12,7 @@ def findGEI(preProcessedData):
     
     GEIs = []
     testDf = pd.DataFrame()
-    
-    testDf = pd.DataFrame.from_dict(preProcessedData, dtype = 'uint8')
+    testDf = pd.DataFrame.from_dict(preProcessedData, dtype = 'uint32')
     
     for d in preProcessedData:
         tempArr = np.asarray(d.get("cycleImgs"))
@@ -33,7 +32,7 @@ def getFeatures(preProcessedData):
     
     combinedGEIs, subIds = findGEI(preProcessedData)
     
-    X_train, X_test, y_train, y_test = train_test_split(combinedGEIs, subIds, test_size=0.30, random_state=42, stratify = subIDs)
+    X_train, X_test, y_train, y_test = train_test_split(combinedGEIs, subIds, test_size=0.30, random_state=42)
     
     return X_train, X_test, y_train, y_test
 

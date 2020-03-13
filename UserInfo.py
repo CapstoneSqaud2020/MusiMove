@@ -8,7 +8,6 @@ db = client.MusiMove
 #check that the user exists returns a boolean
 def userExists(username):
     acc = db.account#connects to the specific collection in the db, in this case it connects to the collection accounts
-    
     if(acc.count_documents({"usrnm":username.lower()})>0):
         return 1
     else:
@@ -26,8 +25,7 @@ def login(username, password):
 def addNewUser(username, password):
     acc = db.account
     id = 100000004 + inc()
-    print(id)
-    insert = acc.insert_one({"_id":id, "usrnm":username.lower(), "pw":password, "timeout": "Never Stop PLAYING"})
+    insert = acc.insert_one({"_id":id, "usrnm":username.lower(), "pw":password, "timeout": "Stay On", "musicOpt":"Radio", "radStation": 0})
     #returns the account id of the user(which is generated client side when added to the collection)
     return id
 
@@ -36,7 +34,6 @@ def inc():
     num = c.find({"_id":'5e60a40c1c9d4400002379d4'})
     c.update_one({"_id":'5e60a40c1c9d4400002379d4'}, {"$inc": {"count": 1}})
     return num[0].get("count")
-
 
 def deleteUser(user_id):
     acc = db.account
@@ -50,3 +47,22 @@ def getStopTime(user_id):
     acc = db.account
     user = acc.find({"_id":user_id})
     return user[0].get("timeout")
+
+def updateMusicOpt(user_id, value):
+    acc = db.account
+    acc.update_one({"_id":user_id}, {"$set": {"musicOpt": value}})
+
+def getMusicOpt(user_id):
+    acc = db.account
+    user = acc.find({"_id":user_id})
+    return user[0].get("musicOpt")
+
+
+def updateRadioStation(user_id, value):
+    acc = db.account
+    acc.update_one({"_id":user_id}, {"$set": {"radStation": value}})
+
+def getRadioStation(user_id):
+    acc = db.account
+    user = acc.find({"_id":user_id})
+    return user[0].get("radStation")
