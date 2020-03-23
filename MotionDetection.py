@@ -1,12 +1,52 @@
 import imutils
 import cv2
 import numpy as np
+import os
+import time
+
+import BinarySilhouette
 
 motion_detected = False
+cap = None
+
+STD_DIMENSIONS =  {
+   "480p": (640, 480),
+   "720p": (1280, 720),
+   "1080p": (1920, 1080),
+   "4k": (3840, 2160),
+}
+
+VIDEO_TYPE = {
+   'avi': cv2.VideoWriter_fourcc(*'XVID'),
+   #'mp4': cv2.VideoWriter_fourcc(*'H264'),
+   'mp4': cv2.VideoWriter_fourcc(*'XVID'),
+}
+
+def get_video_type(filename):
+   filename, ext = os.path.splitext(filename)
+   if ext in VIDEO_TYPE:
+     return  VIDEO_TYPE[ext]
+   return VIDEO_TYPE['avi']
+
+# grab resolution dimensions and set video capture to it.
+def get_dims(cap, res='1080p'):
+   width, height = STD_DIMENSIONS["480p"]
+   if res in STD_DIMENSIONS:
+       width,height = STD_DIMENSIONS[res]
+   ## change the current caputre device
+   ## to the resulting resolution
+   change_res(cap, width, height)
+   return width, height
+
+def change_res(cap, width, height):
+   cap.set(3, width)
+   cap.set(4, height)
+
 
 def motion():
+    global cap
+    id = -1
     motion_detected=False
-
 
     Frame = 10
     MIN_MOVEMENT_SIZE = 7000
@@ -23,6 +63,7 @@ def motion():
         ret, frame = cap.read()
         text = "No motion"
         if not ret:
+            cap = cv2.VideoCapture(0)
             print("ERROR")
             continue
         frame = imutils.resize(frame, width=750)
@@ -50,17 +91,41 @@ def motion():
         if movement_persistent_counter > 0:
             text = "Movement Detected " + str(movement_persistent_counter)
             movement_persistent_counter -= 1
-            motion_detected = True
+            id = record()
+            if id > 10000000:
+                cap.release()
+                return id
+
         else:
             text = "No Movement Detected"
-        frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
-        cv2.imshow("frame", np.hstack((frame_delta, frame)))
+        #frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
+        #cv2.imshow("frame", np.hstack((frame_delta, frame)))
         ch = cv2.waitKey(1)
         if ch & 0xFF == ord('q'):
             break
     cv2.waitKey(0)
-    cv2.destroyAllWindows()
     cap.release()
-    return motion_detected
+     
+    #cv2.destroyAllWindows()
+def record():
+    global cap, res
+    filename = 'video.avi'
+    frames_per_second = 24.0
+    res = '720p'
+    
+    out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(cap, res))
+    timeout = time.time() + 4
+    while True:
+        ret, frame = cap.read()
+        out.write(frame)
+        if (cv2.waitKey(1) & 0xFF == ord('q')) or time.time() > timeout:
+            break
+    out.release()
+    return BinarySilhouette.preprocess(0)
 
-motion_detected = motion()
+
+
+    
+
+#motion_detected = motion()
+#print(motion_detected)

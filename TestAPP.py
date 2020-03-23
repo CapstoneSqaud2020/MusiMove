@@ -3,7 +3,10 @@ import tkinter as tk
 import UserInfo 
 import Webcam
 import testRadio
+import MotionDetection
 from tkinter import messagebox
+
+import threading
 import os
 
 import numpy as np
@@ -61,7 +64,7 @@ class Applcation:
             testRadio.play()
     
     def browsefile(self):
-
+        okay
 
     def addPlaylist(self, file):
         self.musicList.insert(0,os.path.basename(file))
@@ -243,20 +246,39 @@ class Applcation:
         self.mainpage()
         Webcam.stopVideoProc(self)
 
+
+
+    def passive(self):
+        while True:
+            id = MotionDetection.motion()
+
+            if testRadio.is_paused and id != -1:
+                urls = ["http://stream.revma.ihrhls.com/zc545", "https://stream.revma.ihrhls.com/zc2341"]
+                index = UserInfo.getRadioStation(id)
+                testRadio.setRadio(urls[index])
+                testRadio.play
+           
+
     def __init__(self):
         #min size for window
         self.HEIGHT = 600 
         self.WIDTH = 1000
 
         #window object w/ window header
-        #self.user_id = None
-        self.user_id = 10000009
+        self.user_id = None
+        #self.user_id = 10000009
         self.root = tk.Tk()
         self.root.minsize(height = self.HEIGHT, width = self.WIDTH)
         self.root.title("MusiMove - The music that moves you")
-        #self.welcome()
-        self.mainpage()  
+        self.welcome()
+        
+        self.passiveThread = threading.Thread(target = self.passive)
+        self.passiveThread.start()
+        #self.mainpage()
+        #self.root.after(0,self.)
         self.root.mainloop()
+
+
 
 
 ap = Applcation()

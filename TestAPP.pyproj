@@ -23,7 +23,9 @@
   <ItemGroup>
     <Compile Include="BinarySilhouette.py" />
     <Compile Include="FeatrueExtractionforNewUsers.py" />
+    <Compile Include="final_cnn_load.py" />
     <Compile Include="GaitIsolation.py" />
+    <Compile Include="MotionDetection.py" />
     <Compile Include="testRadio.py" />
     <Compile Include="UserInfo.py">
       <SubType>Code</SubType>

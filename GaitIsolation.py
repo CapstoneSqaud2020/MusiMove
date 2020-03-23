@@ -67,14 +67,20 @@ def findGait(user_id):
                     for p1, p2 in grouped(peaks[0],2):
                         seq_num += 1
                         gaits.append({"usr_id":user_id, "seq_num":seq_num, "startFrame":frame[p1], "endFrame":frame[p2], "cycleImgs":imgs[p1:p2+1]})
+                        if user_id == 0:
+                            break
 
                 elif len(peaks[0])>1:
                     for p1, p2, p3 in grouped(peaks[0],3):
                         seq_num += 1
                         gaits.append({"usr_id":user_id, "seq_num":seq_num, "startFrame":frame[p1], "endFrame":frame[p2], "cycleImgs":imgs[p1:p2+1]})
+                        if user_id == 0:
+                            break
 
+    #shutil. rmtree(PATH)
+    if len(gaits)<1:
+        return -1
 
-    #shutil. rmtree(PATH) 
     return FeatrueExtractionforNewUsers.callModel(gaits)      
 
 

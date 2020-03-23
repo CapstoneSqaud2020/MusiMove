@@ -43,36 +43,37 @@ def preprocess(user_id):
         con = sorted(con,key = cv2.contourArea, reverse = True) 
 
         #finds the person
+        for c in con:
+            x,y,w,h = cv2.boundingRect(c)
+            i = int((2*x+w)/2)
+            d = int(((88*h)/128)/2)
+            #checks where they are
+            if i> width/3 and i< 2*width/3:
+                current = 1
+                if current != prev :
+                    #creates folder
+                    folder = os.path.join(PATH, f'{f:03}')
+                    f = f+1
+                    if not os.path.exists(folder):
+                        os.makedirs(folder)
 
-        x,y,w,h = cv2.boundingRect(con[0])
-        i = int((2*x+w)/2)
-        d = int(((88*h)/128)/2)
-        #checks where they are
-        if i> width/3 and i< 2*width/3:
-            current = 1
-            if current != prev :
-                #creates folder
-                folder = os.path.join(PATH, f'{f:03}')
-                f = f+1
-                if not os.path.exists(folder):
-                    os.makedirs(folder)
-
-            ROI = fgmask[y:y+h,i-d:i+d]
-            ROI = cv2.resize(ROI,(88,128))
-            ROI = cv2.normalize(ROI,  ROI, 0, 255, cv2.NORM_MINMAX)
+                ROI = fgmask[y:y+h,i-d:i+d]
+                ROI = cv2.resize(ROI,(88,128))
+                ROI = cv2.normalize(ROI,  ROI, 0, 255, cv2.NORM_MINMAX)
             
-            avg = cv2.sumElems(ROI)[0]/(225*88*128) 
-            if(avg <= .6 and avg >= .15):
-                #saves the image
-                cv2.imwrite(folder + '\\' + f'{img:08}' + '.png',ROI)
-                img = img+1
+                avg = cv2.sumElems(ROI)[0]/(225*88*128) 
+                if(avg <= .6 and avg >= .15):
+                    #saves the image
+                    cv2.imwrite(folder + '\\' + f'{img:08}' + '.png',ROI)
+                    img = img+1
            
-        else:
-            current = 0
-            if os.path.exists(folder):
-               if not os.listdir(folder):
-                   os.rmdir(folder)
-        prev = current
+            else:
+                current = 0
+                if os.path.exists(folder):
+                    if not os.listdir(folder):
+                        os.rmdir(folder)
+            prev = current
+            break
 
     cap.release() 
     cv2.destroyAllWindows() 

@@ -7,6 +7,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import final_cnn_load as fcl
 
 def findGEI(preProcessedData):
     
@@ -41,9 +42,12 @@ def getFeatures(preProcessedData):
 
 
 def callModel(preProcessedData):
-    
-    X_train, X_test, y_train, y_test = getFeatures(preProcessedData)
-    return 1
+   if preProcessedData.get("usr_id") == 0:
+       GEI, _ = findGEI(preProcessedData)
+       return fcl.predict_model(GEI)
+   else:
+        X_train, X_test, y_train, y_test = getFeatures(preProcessedData)
+        return 10009
 #    probVectorORClass = CNN(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
     
 #    return probVectorORClass
