@@ -57,7 +57,7 @@ def get_video_type(filename):
 #out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(cap, res))
 
 def startVideoProc(self):
-    self.stopEvent = threading.Event()
+    self.stopEvent = False
     self.cap = cv2.VideoCapture(0)
     self.out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(self.cap, res))
     startVideo(self)
@@ -66,7 +66,7 @@ def startVideoProc(self):
 def startVideo(self):
     #out.write(frame)
     try:
-        if not self.stopEvent.is_set():
+        if not self.stopEvent:
         
             _, self.frame = self.cap.read()
             frame1 = cv2.flip(self.frame, 1)
@@ -88,7 +88,7 @@ def startVideo(self):
         print("[INFO] caught a RuntimeError")
   
 def stopVideoProc(self):
-        self.stopEvent.set()
+        self.stopEvent = True
         self.cap.release()
         self.out.release()
         cv2.destroyAllWindows()
@@ -96,7 +96,7 @@ def stopVideoProc(self):
         t.start()
 
 def saveVideo(self):
-    if not self.stopEvent.is_set():
+    if not self.stopEvent:
          self.out.write(self.frame)
          self.panel.after(10, lambda : saveVideo(self))
 

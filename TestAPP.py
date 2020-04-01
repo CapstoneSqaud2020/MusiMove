@@ -5,11 +5,41 @@ import Webcam
 import testRadio
 import MotionDetection
 from tkinter import messagebox
+from tkinter import filedialog
 
 import threading
+import time
 import os
+import shutil
 
 import numpy as np
+
+
+class passiveThread():
+    def __init__(self):
+        self.__running = True
+
+    def passive(self):
+    
+        while True:
+            if self.__running and testRadio.is_paused:
+                id = MotionDetection.motion()
+                print(id)
+                if testRadio.is_paused and id != -1:
+                    if UserInfo.getMusicOpt(id) == "Radio":
+                        urls = ["http://stream.revma.ihrhls.com/zc545", "https://stream.revma.ihrhls.com/zc2341"]
+                        index = UserInfo.getRadioStation(id)
+                        testRadio.setRadio(urls[index])
+                        testRadio.play()
+                    else:
+                        testRadio.playPlaylist()
+
+    def pause_passive(self):
+        self.__running = False
+
+    def continue_passive(self):
+        self.__running = True
+
 
 class Applcation:
     #gonna try to get people to log onto spotify or use playlist from their
@@ -31,23 +61,36 @@ class Applcation:
             dropVar = tk.StringVar()
             dropVar.set(stations[index])
             opts = tk.OptionMenu(frame, dropVar, *stations, command= self.changeRadStation)
-            opts.place(relwidth=.333, relheight = .1, rely = .325, relx = .333)
+            opts.place(relwidth=.333, relheight = .1, rely = .3, relx = .333)
+
+            play = tk.Button(frame, text = "play", command = testRadio.play).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .1665)
+            pause =  tk.Button(frame, text = "pause", command = testRadio.stop ).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .5)
             
         else:
             tk.Label(frame, text = "Playlist:", bg="#C1DDE7", font=("Helvetica", 12)).place(relwidth = .333, relheight = 0.1, relx = .333, rely = .2)            
-            self.musicFiles = []
-            self.musicList = tk.Listbox(frame)
-            self.musicList.place(relwidth=.333, relheight = .1, rely = .325, relx = .333)
-            
-            for f in os.path.listdir("Music"):
-                if os.path.isfile(os.path.join("Music", f)):
-                    self.addPlaylist(f)  
-            
-            #testRadio.setRadio("http://stream.revma.ihrhls.com/zc545")
+            path = "Music"
 
+            scrollBar_y = tk.Scrollbar(frame)
+            scrollBar_x = tk.Scrollbar(frame)
+            
+            self.musicList = tk.Listbox(frame)
+            self.musicList.place(relwidth=.666, relheight = .3, rely = .3, relx = .167)
+            self.musicList.insert(tk.END, *[s[:-4] for s in os.listdir(path) if os.path.isfile(os.path.join(path,s))])
+            self.musicList.config(yscrollcommand = scrollBar_y.set, xscrollcommand = scrollBar_x.set)
+
+            scrollBar_y.config(command=self.musicList.yview)
+            scrollBar_x.config(command=self.musicList.xview)
+
+
+            addMusic = tk.Button(frame, text = "add", command = self.addSong).place(relwidth = .333, relheight = 0.1, rely = .65, relx = .1665)
+            removeMusic = tk.Button(frame, text = "delete", command = self.removeFile).place(relwidth = .333, relheight = 0.1, rely = .65, relx = .5)
+
+            play = tk.Button(frame, text = "play", command = self.playSingleSong).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .1665)
+            pause =  tk.Button(frame, text = "pause", command = testRadio.stop ).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .5)
+            
+            
         tk.Label(frame, text = "music", bg = "#E7CBC1", fg = "#FFFFFF", font=("Helvetica", 20)).place(relwidth = .333, relheight = 0.1)
-        play = tk.Button(frame, text = "play", command = testRadio.play).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .1665)
-        pause =  tk.Button(frame, text = "pause", command = testRadio.pause ).place(relwidth = .333, relheight = 0.1, rely = .8, relx = .5)
+
         #musicMenu = tk.Menu()
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -59,19 +102,40 @@ class Applcation:
         was_paused = testRadio.is_paused
         if not testRadio.is_paused:
             testRadio.stop()
+
         testRadio.setRadio(station.get(value)[1])
+        
         if not was_paused:
             testRadio.play()
     
-    def browsefile(self):
-        okay
 
-    def addPlaylist(self, file):
-        self.musicList.insert(0,os.path.basename(file))
-        self.musicFiles.insert(0,file)
+    def playSingleSong(self):
+        i = self.musicList.curselection()
+        if i:
+            testRadio.stop()
+            song = self.musicList.get(i)
+            songPath = os.path.join("Music",song+".mp3")
+            testRadio.setRadio(songPath)
+            testRadio.play()
+        else:
+            messagebox.showerror("Error", "Please click on song")
+
+
+    def addSong(self):
+        file = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("MP3 files","*.mp3"),))
+        if file:
+            shutil.copy(file,"Music")
+            self.musicList.insert(tk.END,os.path.basename(file[:-4]))
     
     def removeFile(self):
-        okay
+        i = self.musicList.curselection()
+        if i:
+            song = self.musicList.get(i)
+            os.remove(os.path.join("Music",song+".mp3"))
+            self.musicList.delete(i)
+        else:
+            messagebox.showerror("Error", "Please click on song")
+
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -157,6 +221,9 @@ class Applcation:
 
     #allows user to enter their username/password to be logged in
     def Login(self):
+        self.p.pause_passive()
+        time.sleep(.5)
+
         canvas = tk.Canvas(self.root, bg = "#C1DDE7").place(relwidth = 1, relheight = 1)
     
         frame = tk.Frame(self.root, bg="#80c1ff", bd=5, height = self.HEIGHT / 1.5, width = self.WIDTH)
@@ -181,6 +248,9 @@ class Applcation:
 
     #allows user to enter their username/password to be registered
     def Register(self):
+        self.p.pause_passive()
+        time.sleep(.5)
+
         canvas = tk.Canvas(self.root, bg = "#C1DDE7").place(relwidth = 1, relheight = 1)
     
         frame = tk.Frame(self.root, bg="#80c1ff", bd=5, height = self.HEIGHT / 1.5, width = self.WIDTH)
@@ -216,7 +286,8 @@ class Applcation:
         #login/register buttons command is the function that they call
         lg = tk.Button(canvas, text = "Login", command = self.Login).place(relwidth = 0.3, relheight = 0.15, relx = 0.35, rely = .525)
         reg = tk.Button(canvas, text = "Register", command = self.Register).place(relwidth = 0.3, relheight = 0.15, relx = 0.35, rely = .685)  
-
+        
+        self.p.continue_passive()
 
     def recordVideo(self):
         canvas = tk.Canvas(self.root, bg = "#C1DDE7")
@@ -234,7 +305,7 @@ class Applcation:
 
         self.panel = tk.Label(canvas, bg="#80c1ff")
         self.panel.place(relwidth = .6, relheight = .6,relx = .2, rely = .2)
-
+        time.sleep(1)
         Webcam.startVideoProc(self)  
 
     def saveVideoProc(self):
@@ -247,18 +318,6 @@ class Applcation:
         Webcam.stopVideoProc(self)
 
 
-
-    def passive(self):
-        while True:
-            id = MotionDetection.motion()
-
-            if testRadio.is_paused and id != -1:
-                urls = ["http://stream.revma.ihrhls.com/zc545", "https://stream.revma.ihrhls.com/zc2341"]
-                index = UserInfo.getRadioStation(id)
-                testRadio.setRadio(urls[index])
-                testRadio.play
-           
-
     def __init__(self):
         #min size for window
         self.HEIGHT = 600 
@@ -270,10 +329,13 @@ class Applcation:
         self.root = tk.Tk()
         self.root.minsize(height = self.HEIGHT, width = self.WIDTH)
         self.root.title("MusiMove - The music that moves you")
-        self.welcome()
         
-        self.passiveThread = threading.Thread(target = self.passive)
+        
+        self.p = passiveThread()
+        self.passiveThread = threading.Thread(target = self.p.passive)
         self.passiveThread.start()
+        
+        self.welcome()
         #self.mainpage()
         #self.root.after(0,self.)
         self.root.mainloop()

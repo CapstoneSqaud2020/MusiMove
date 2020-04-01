@@ -42,12 +42,13 @@ def getFeatures(preProcessedData):
 
 
 def callModel(preProcessedData):
-   if preProcessedData.get("usr_id") == 0:
+   if preProcessedData[0].get("usr_id") == 0:
        GEI, _ = findGEI(preProcessedData)
-       return fcl.predict_model(GEI)
+       return fcl.predict_model(GEI[0])
+       #return 10000009
    else:
         X_train, X_test, y_train, y_test = getFeatures(preProcessedData)
-        return 10009
+        return 10000009
 #    probVectorORClass = CNN(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
     
 #    return probVectorORClass

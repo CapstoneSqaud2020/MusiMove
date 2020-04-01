@@ -6,6 +6,7 @@ import lmfit
 import itertools
 
 #import pickle
+import time
 import FeatrueExtractionforNewUsers
 import shutil
 
@@ -77,10 +78,10 @@ def findGait(user_id):
                         if user_id == 0:
                             break
 
-    #shutil. rmtree(PATH)
+    shutil. rmtree(PATH)
     if len(gaits)<1:
         return -1
-
+    print(time.time())
     return FeatrueExtractionforNewUsers.callModel(gaits)      
 
 

@@ -57,13 +57,13 @@ def motion():
 
     delay_counter = 0
     movement_persistent_counter = 0
-
-    while True:
+    endtime = time.time() + 5
+    while True and time.time() < endtime:
         transient_movement_flag = False
         ret, frame = cap.read()
         text = "No motion"
         if not ret:
-            cap = cv2.VideoCapture(0)
+            #cap = cv2.VideoCapture(0)
             print("ERROR")
             continue
         frame = imutils.resize(frame, width=750)
@@ -91,24 +91,30 @@ def motion():
         if movement_persistent_counter > 0:
             text = "Movement Detected " + str(movement_persistent_counter)
             movement_persistent_counter -= 1
+            cap.release()
             id = record()
+            print(id)
             if id > 10000000:
-                cap.release()
                 return id
+            else:
+               cap = cv2.VideoCapture(0)
 
         else:
             text = "No Movement Detected"
+            #cap = cv2.VideoCapture(0)
         #frame_delta = cv2.cvtColor(frame_delta, cv2.COLOR_GRAY2BGR)
         #cv2.imshow("frame", np.hstack((frame_delta, frame)))
         ch = cv2.waitKey(1)
         if ch & 0xFF == ord('q'):
             break
-    cv2.waitKey(0)
     cap.release()
+    return -1
      
     #cv2.destroyAllWindows()
 def record():
+    print("recording")
     global cap, res
+    cap = cv2.VideoCapture(0)
     filename = 'video.avi'
     frames_per_second = 24.0
     res = '720p'
@@ -120,7 +126,9 @@ def record():
         out.write(frame)
         if (cv2.waitKey(1) & 0xFF == ord('q')) or time.time() > timeout:
             break
+
     out.release()
+    cap.release()
     return BinarySilhouette.preprocess(0)
 
 

@@ -1,7 +1,7 @@
 import os
 import shutil
 import sklearn.preprocessing
-import numpy as np 
+import numpy as np
 import cv2 
 import GaitIsolation
 
@@ -78,6 +78,5 @@ def preprocess(user_id):
     cap.release() 
     cv2.destroyAllWindows() 
     os.remove('video.avi')
-
     return GaitIsolation.findGait(user_id)
 
