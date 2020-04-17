@@ -7,6 +7,7 @@ import GaitIsolation
 
 
 def preprocess(user_id):
+    #return GaitIsolation.findGait(user_id)
     #gets video
     cap = cv2.VideoCapture('video.avi') 
     #cap = cv2.VideoCapture(r'C:\Users\JS-X360\Pictures\Original-20200129T082016Z-001\Original\N2_Trim.avi') 
@@ -34,13 +35,14 @@ def preprocess(user_id):
             break
         #removes bg
         fgmask = fgbg.apply(frame)
-        fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
-        fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_CLOSE, kernel)
-
-        #thresh, fgmask = cv2.threshold(fgmask, 127, 255, cv2.THRESH_BINARY)
+        fgmask = cv2.erode(fgmask, kernel, iterations = 2)
+        fgmask = cv2.dilate(fgmask,kernel,iterations = 1)
     
         con, h = cv2.findContours(fgmask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         con = sorted(con,key = cv2.contourArea, reverse = True) 
+
+        #fgmask = cv2.fillPoly(fgmask, pts =con, color=(255,255,255))
+
 
         #finds the person
         for c in con:
@@ -64,6 +66,7 @@ def preprocess(user_id):
                 avg = cv2.sumElems(ROI)[0]/(225*88*128) 
                 if(avg <= .6 and avg >= .15):
                     #saves the image
+
                     cv2.imwrite(folder + '\\' + f'{img:08}' + '.png',ROI)
                     img = img+1
            

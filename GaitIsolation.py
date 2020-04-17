@@ -7,7 +7,7 @@ import itertools
 
 #import pickle
 import time
-import FeatrueExtractionforNewUsers
+import FeatureExtractionComplete
 import shutil
 
 def grouped(iterable, n):
@@ -68,21 +68,21 @@ def findGait(user_id):
                     for p1, p2 in grouped(peaks[0],2):
                         seq_num += 1
                         gaits.append({"usr_id":user_id, "seq_num":seq_num, "startFrame":frame[p1], "endFrame":frame[p2], "cycleImgs":imgs[p1:p2+1]})
-                        if user_id == 0:
-                            break
+                        
 
                 elif len(peaks[0])>1:
                     for p1, p2, p3 in grouped(peaks[0],3):
                         seq_num += 1
                         gaits.append({"usr_id":user_id, "seq_num":seq_num, "startFrame":frame[p1], "endFrame":frame[p2], "cycleImgs":imgs[p1:p2+1]})
-                        if user_id == 0:
-                            break
-
+                        
     shutil. rmtree(PATH)
     if len(gaits)<1:
         return -1
-    print(time.time())
-    return FeatrueExtractionforNewUsers.callModel(gaits)      
+    #print(time.time())
+    if user_id == 0:
+        return FeatrueExtractionforNewUsers.callModelExistingUser(gaits)
+    else:
+        return FeatrueExtractionforNewUsers.callModelNewUser(gaits)
 
 
         

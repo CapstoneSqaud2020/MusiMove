@@ -4,15 +4,15 @@
 # In[1]:
 
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import final_cnn_load as fcl
 
 def findGEI(preProcessedData):
     
     GEIs = []
     testDf = pd.DataFrame()
-    
     testDf = pd.DataFrame.from_dict(preProcessedData, dtype = 'uint8')
     
     for d in preProcessedData:
@@ -81,10 +81,10 @@ def saveFile(fileToSave, file):
 def addNewClass(preProcessedData):
     xTrainNew, xTestNew, yTrainNew, yTestNew = getFeatures(preProcessedData)
 
-    xtrainExisting = "C:\\Users\\aishw\\Desktop\\Capstone Stuff\\Train_and_Test_Features_and_Labels\\trainingGEIs.pickle"    
-    ytrainExisting = "C:\\Users\\aishw\\Desktop\\Capstone Stuff\\Train_and_Test_Features_and_Labels\\trainingSubIDs.pickle"
-    xtestExisting = "C:\\Users\\aishw\\Desktop\\Capstone Stuff\\Train_and_Test_Features_and_Labels\\testingGEIs.pickle"
-    ytestExisting = "C:\\Users\\aishw\\Desktop\\Capstone Stuff\\Train_and_Test_Features_and_Labels\\testingSubIDs.pickle"
+    xtrainExisting = "trainingGEIs.pickle"    
+    ytrainExisting = "trainingSubIDs.pickle"
+    xtestExisting = "testingGEIs.pickle"
+    ytestExisting = "testingSubIDs.pickle"
     
     existingXTrain = loadFile(xtrainExisting)
     existingYTrain = loadFile(ytrainExisting)
@@ -131,20 +131,10 @@ def callModelExistingUser(preProcessedData):
     #Updated datasets
     X_train, X_test, y_train, y_test = getFeatures(preProcessedData)
     
-    probVectorORClass = CNN(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
+    probVectorORClass = fcl.predict_model(X_train, X_test, y_train, y_test) #final list of probabilities/final classification
     
     return probVectorORClass
     
 
 
-# In[ ]:
-
-
-#for testing ONLY
-ourSamples = 'C:\\Users\\aishw\\Desktop\\Capstone Stuff\\gc001.pickle'
-ourData = loadFile(ourSamples)
-    
-xTraining, yTraining, xTesting, yTesting = addNewClass(ourData)
-
-np.shape(xTraining)
 

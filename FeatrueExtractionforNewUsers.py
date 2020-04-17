@@ -4,7 +4,7 @@
 # In[1]:
 
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import final_cnn_load as fcl
@@ -18,7 +18,8 @@ def findGEI(preProcessedData):
     for d in preProcessedData:
         tempArr = np.asarray(d.get("cycleImgs"))
         GEIs.append(np.mean(tempArr, axis = 0))
-        
+
+    GEIs = np.asarray(GEIs)    
     subIds = testDf['usr_id'].to_numpy(dtype = 'int32')
     
     return GEIs, subIds
@@ -44,7 +45,7 @@ def getFeatures(preProcessedData):
 def callModel(preProcessedData):
    if preProcessedData[0].get("usr_id") == 0:
        GEI, _ = findGEI(preProcessedData)
-       return fcl.predict_model(GEI[0])
+       return fcl.predict_model(GEI)
        #return 10000009
    else:
         X_train, X_test, y_train, y_test = getFeatures(preProcessedData)

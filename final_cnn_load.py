@@ -1,16 +1,20 @@
 from __future__ import print_function
 import tensorflow as tf
 import tensorflow.keras as keras
-from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import model_from_json 
 import numpy as np
+from scipy import stats
 import pickle
 
-def predict_model(input):
 
+
+def predict_model(input):
+    print(input.shape)
     #formatting shape
-    #input = input.reshape((1, 128, 88, 1)).astype(np.float32)
+    #input = input.reshape((1,128, 88, 1)).astype(np.float32)
+    input = np.expand_dims(input,axis = 3)
     input /= 255
-    input = np.expand_dims(input,axis=0)
+    #input = np.expand_dims(input,axis=0)
     print(input.shape)
 
     #load model
@@ -27,14 +31,14 @@ def predict_model(input):
 
     #predict using loaded model
     data = loaded_model.predict(input)
-
+    
     #get subject id
     label_train = pickle.load(open("./trainingSubIDs.pickle",'rb'))
     label_train = np.asarray(label_train)
     sorted = np.unique(label_train)
-
+    
     #find index of max prediction
-    x = np.argmax(data)
-    prediction = sorted[x]
+    x = stats.mode(np.argmax(data, axis=1))
+    prediction = sorted[x[0]]
     print(prediction)
     return prediction
